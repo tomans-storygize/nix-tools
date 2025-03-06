@@ -1,6 +1,10 @@
 {pkgs, ...}:
 
-{
+let
+  username = "tomans";
+  fullname = "Thomas Omans";
+  email = "tomans@storygize.com";
+in {
 
   home.packages = [
     pkgs.silver-searcher
@@ -23,6 +27,8 @@
     pkgs.bottom
     pkgs.magic-wormhole
 
+    # pkgs.fish
+
     pkgs.wget
     pkgs.curl
 
@@ -32,8 +38,8 @@
 
   programs.git = {
     enable = true;
-    userName = "Thomas Omans";
-    userEmail = "tomans@storygize.com";
+    userName = "${fullname}";
+    userEmail = "${email}";
 
     extraConfig = {
       branch.autosetuprebase = "always";
@@ -91,19 +97,44 @@
     themeFile = "Kaolin_Breeze";
   };
 
-  services = {};
+
+  programs.vscode = {
+    enable = true;
+    profiles.default.userSettings = {
+      # ...
+      "workbench.colorTheme" = "Dracula Theme";
+      "files.watcherExclude" = {
+        "**/.bloop" = true;
+        "**/.metals" =  true;
+        "**/.ammonite" = true;
+      };
+    };
+
+    # ...
+
+    profiles.default.extensions = [
+      pkgs.vscode-marketplace.scala-lang.scala
+      pkgs.vscode-marketplace.scalameta.metals
+      pkgs.vscode-marketplace.redhat.java
+      pkgs.vscode-marketplace.mkhl.direnv
+      pkgs.vscode-marketplace.vscjava.vscode-java-pack
+      pkgs.vscode-marketplace.dracula-theme.theme-dracula
+    ];
+  };
 
   # Adapted from https://github.com/yrashk/nix-home/blob/master/home.nix#L194
   # systemd stuff: see above link
 
+  services = {};
+
   # Dotfiles for the home root, ~/
   home.stateVersion = "24.11";
-  home.username = "tomans";
+  home.username = "${username}";
   home.sessionVariables = {
     EDITOR = "hx";
-    SHELL = "xterm-256color";
+    # SHELL = "kitty";
     GIT_EXTERNAL_DIFF = "difft";
-    XDG_CONFIG_HOME = "/Users/tomans/.config";
+    XDG_CONFIG_HOME = "/Users/${username}/.config";
     LANG = "en_US.UTF-8";
     LC_TYPE = "en_US.UTF-8";
     LC_ALL = "en_US.UTF-8";

@@ -7,11 +7,22 @@
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
     home-manager.url = "github:nix-community/home-manager";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
+    nix-vscode-extensions.url = "github:nix-community/nix-vscode-extensions";
+    nix-vscode-extensions.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = inputs@{ self, nix-darwin, home-manager, nixpkgs }:
-  let
-    configuration = { pkgs, ... }: {
+  outputs = inputs@{
+    self,
+    nixpkgs,
+    nix-darwin,
+    home-manager,
+    nix-vscode-extensions
+  }:
+    let
+      user_NAME = "tomans"; # whoami
+      hostname = "Storygize-tomans"; # hostname -s
+
+      configuration = { pkgs, ... }: {
       # List packages installed in system profile. To search by name, run:
       # $ nix-env -qaP | grep wget      
 
@@ -26,16 +37,23 @@
       nix.settings.experimental-features = "nix-command flakes";
       nix.settings.trusted-users = [
         "root"
-        "tomans"
+        user_NAME
       ];
 
-      # Enable alternative shell support in nix-darwin.
-      # programs.fish.enable = true;
-      users.users.tomans = {
-        home = "/Users/tomans";
-        # shell = pkgs.fish;
-      };
+      nix.channel.enable = false;
+      # some system level vscode stuff
+      nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (pkgs.lib.getName pkg) [
+        # list of non-free software allowed to be installed
+        "vscode"
+        "Xcode.app"
+      ];
+      nixpkgs.overlays = [
+        nix-vscode-extensions.overlays.default
+      ];
 
+      users.users."${user_NAME}" = {
+        home = "/Users/${user_NAME}";
+      };
 
       # Set Git commit hash for darwin-version.
       system.configurationRevision = self.rev or self.dirtyRev or null;
@@ -51,14 +69,14 @@
   {
     # Build darwin flake using:
     # $ darwin-rebuild build --flake .#Storygize-tomans
-    darwinConfigurations."Storygize-tomans" = nix-darwin.lib.darwinSystem {
+    darwinConfigurations."${hostname}" = nix-darwin.lib.darwinSystem {
       modules = [
         configuration
         home-manager.darwinModules.home-manager
         {
           home-manager.useGlobalPkgs = true;
           home-manager.useUserPackages = true;
-          home-manager.users.tomans = import ./home.nix;
+          home-manager.users."${user_NAME}" = import ./home.nix;
 
           # Optionally, use home-manager.extraSpecialArgs to pass
           # arguments to home.nix

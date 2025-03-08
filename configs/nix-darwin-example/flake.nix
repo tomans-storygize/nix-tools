@@ -31,6 +31,7 @@
           pkgs.vim
           # some standard admin tools
           pkgs.git
+          
         ];
 
       # Necessary for using flakes on this system.
@@ -45,6 +46,8 @@
       nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (pkgs.lib.getName pkg) [
         # list of non-free software allowed to be installed
         "vscode"
+        "packer"
+        "1password-cli"
         "Xcode.app"
       ];
       nixpkgs.overlays = [

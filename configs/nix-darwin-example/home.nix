@@ -31,6 +31,7 @@ in {
 
     pkgs.wget
     pkgs.curl
+    pkgs._1password-cli
 
     # nix language server
     pkgs.nil
@@ -102,6 +103,7 @@ in {
     enable = true;
     profiles.default.userSettings = {
       # ...
+      "update.mode" = "none";
       "workbench.colorTheme" = "Dracula Theme";
       "files.watcherExclude" = {
         "**/.bloop" = true;
@@ -117,6 +119,7 @@ in {
       pkgs.vscode-marketplace.scalameta.metals
       pkgs.vscode-marketplace.redhat.java
       pkgs.vscode-marketplace.mkhl.direnv
+      pkgs.vscode-marketplace.ms-python.python
       pkgs.vscode-marketplace.vscjava.vscode-java-pack
       pkgs.vscode-marketplace.dracula-theme.theme-dracula
     ];
